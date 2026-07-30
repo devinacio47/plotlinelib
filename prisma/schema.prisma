@@ -1,0 +1,48 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider   = "prisma-client-js"
+  engineType = "client"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Genre {
+  id    Int    @id @default(autoincrement())
+  name  String @unique
+  books Book[]
+}
+
+model Book {
+  id          Int       @id @default(autoincrement())
+  title       String
+  slug        String    @unique
+  author      String
+  description String
+  coverUrl    String
+  genreId     Int
+  published   Int?
+  genre       Genre     @relation(fields: [genreId], references: [id])
+  chapters    Chapter[]
+  uploadedAt  DateTime  @default(now())
+  country     String?
+  status      String?
+}
+
+model Chapter {
+  id         Int      @id @default(autoincrement())
+  number     Int
+  title      String?
+  contentUrl String
+  bookId     Int
+  book       Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  uploadedAt DateTime @default(now())
+
+  @@index([bookId, uploadedAt(sort: Desc)])
+}
